@@ -11,14 +11,17 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/atgoogat/imgcompressor/cli"
 	"github.com/atgoogat/imgcompressor/compressor"
 )
 
-func prefixFilename(filename string) string {
+func prefixFilenameAndExtension(filename, extension string) string {
 	dir, file := filepath.Split(filename)
-	return filepath.Join(dir, "cmp_"+file)
+	ext := filepath.Ext(file)
+	file = strings.TrimSuffix(file, ext)
+	return filepath.Join(dir, "cmp_"+file+"."+extension)
 }
 
 func main() {
@@ -53,7 +56,7 @@ func main() {
 		if args.Estimate {
 			writer = &bytes.Buffer{}
 		} else {
-			fileHandle, err := os.Create(prefixFilename(filename))
+			fileHandle, err := os.Create(prefixFilenameAndExtension(filename, "jpeg"))
 			if err != nil {
 				panic(err)
 			}
