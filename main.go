@@ -52,11 +52,12 @@ func main() {
 			continue
 		}
 
+		newFilename := prefixFilenameAndExtension(filename, "jpeg")
 		var writer io.Writer
 		if args.Estimate {
 			writer = &bytes.Buffer{}
 		} else {
-			fileHandle, err := os.Create(prefixFilenameAndExtension(filename, "jpeg"))
+			fileHandle, err := os.Create(newFilename)
 			if err != nil {
 				panic(err)
 			}
@@ -64,7 +65,7 @@ func main() {
 			writer = fileHandle
 		}
 
-		img = compressor.Resize(args.MaxWidth, img)
+		img = compressor.Resize(args.MaxWidth, args.MaxHeight, img)
 
 		bytes, err := compressor.CompressAndExport(args.Quality, writer, img)
 		if err != nil {
@@ -72,7 +73,7 @@ func main() {
 			fmt.Fprint(os.Stderr, err)
 			continue
 		}
-		fmt.Printf("%15s %5d kb\n", filename, bytes/1024)
+		fmt.Printf("%15s %5d kb (from: %s)\n", newFilename, bytes/1024, filename)
 		bytesSum += bytes
 	}
 	fmt.Printf("%15s %5d kb\n", "Sum", bytesSum/1024)

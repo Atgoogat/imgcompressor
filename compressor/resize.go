@@ -6,9 +6,15 @@ import (
 	"github.com/nfnt/resize"
 )
 
-func Resize(maxWidth uint, img image.Image) image.Image {
-	imgWidth := uint(img.Bounds().Dx())
-	return resize.Resize(min(maxWidth, imgWidth), 0, img, resize.Lanczos3)
+const resizeAlgo = resize.Lanczos3
+
+func Resize(maxWidth uint, maxHeight uint, img image.Image) image.Image {
+	if maxWidth != 0 && maxHeight != 0 {
+		return resize.Thumbnail(maxWidth, maxHeight, img, resizeAlgo)
+	}
+
+	imgW, imgH := img.Bounds().Dx(), img.Bounds().Dy()
+	return resize.Resize(min(uint(imgW), maxWidth), min(uint(imgH), maxHeight), img, resizeAlgo)
 }
 
 func min(a, b uint) uint {
